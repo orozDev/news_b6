@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}| All news{% endblock title %}
+
+{% block content %}
+    <h1 class="mb-5">Welcome to News.KG {% if category %}| News by {{ category.name }}{% endif %}</h1>
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-9">
+            <div class="row mb-5">
+
+                {% for item in news %}
+
+                    <div class="col-12 col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">{{ item.description }}</p>
+                                <p class="card-text">{{ item.category.name }}</p>
+                                <p>
+                                    {% for tag in item.tags.all %}
+                                        <span>{{ tag.name }}</span> /
+                                    {% endfor %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div><a href="{% url 'detail_news' id=item.id %}" class="btn btn-primary">View</a>
+                                    </div>
+                                    <div class="text-end">
+                                        <i class="fa-regular fa-eye"></i> {{ item.views }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% empty %}
+                    <h3>News not found</h3>
+                {% endfor %}
+            </div>
+            {% include 'components/news_pagiantion.html' %}
+        </div>
+        <div class="col-12 col-md-4 col-lg-3">
+
+        </div>
+    </div>
+{% endblock content %}
+
+
+
+
+

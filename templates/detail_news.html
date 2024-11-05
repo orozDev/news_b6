@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}| {{ news.name }}{% endblock title %}
+
+{% block content %}
+    <div class="text-center mb-4">
+        <img src="{{ news.image.url }}" alt="" class="w-75">
+    </div>
+    <h1>{{ news.name }} | {{ news.date }}</h1>
+    <h5>{{ news.description }} | {{ news.category.name }}</h5>
+    <p>
+      {% for tag in news.tags.all %}
+        <span>{{ tag.name }}</span> /
+    {% endfor %}
+    </p>
+    <p>{{ news.content|safe }}</p>
+    <p class="text-end">Author: {{ news.author }}</p>
+
+{#    {{ news.name|json_script:'news' }}#}
+{##}
+{#    <script>#}
+{#        const newName = JSON.parse(document.querySelector('#news').textContent)#}
+{#        console.log(newName)#}
+{##}
+{#    </script>#}
+
+{% endblock content %}

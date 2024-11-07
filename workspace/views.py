@@ -1,11 +1,12 @@
 from pprint import pprint
-
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
 
 from news.models import News, Category, Tag
-from workspace.forms import NewsForm
+from workspace.forms import NewsForm, LoginForm
 
 
 def main(request):
@@ -65,3 +66,35 @@ def delete_news(request, id):
     news.delete()
     messages.success(request, f'The news "{name}" was deleted successfully!')
     return redirect('/workspace/')
+
+
+def login_profile(request):
+
+    if request.user.is_authenticated:
+        return redirect('/workspace/')
+
+    form = LoginForm()
+
+    if request.method == 'POST':
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+
+            user = authenticate(username=username, password=password)
+
+            if user:
+                login(request, user)
+                return redirect('/workspace/')
+
+            messages.error(request, 'The user does not exist or password is incorrect')
+
+    return render(request, 'auth/login.html', {'form': form})
+
+
+def logout_profile(request):
+
+    if request.user.is_authenticated:
+        logout(request)
+
+    return redirect('/')

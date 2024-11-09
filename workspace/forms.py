@@ -1,4 +1,8 @@
 from django import forms
+from django.contrib.auth.forms import BaseUserCreationForm
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
 
 from news.models import Category, Tag, News
 
@@ -57,3 +61,47 @@ class LoginForm(forms.Form):
 
     username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+
+BaseUserCreationForm
+
+
+class RegisterForm(forms.ModelForm):
+
+    password1 = forms.CharField(
+        label='Придумайте пароль',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        validators=[validate_password]
+    )
+    password2 = forms.CharField(label='Подтвердите пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'password1',
+            'password2',
+        )
+
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите имя'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите фамилию'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Придумайте имя пользователя'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Введите эл. почту'}),
+        }
+
+    def clean(self):
+        password1 = self.cleaned_data.pop('password1', None)
+        password2 = self.cleaned_data.pop('password2', None)
+
+        if password1 is not None and password2 is not None:
+
+            if password1 != password2:
+                raise forms.ValidationError({'password2': ['The passwords are not matched.']})
+
+            self.cleaned_data['password'] = make_password(password1)
+
+        return self.cleaned_data

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 
 from news.models import News, Category, Tag
-from workspace.forms import NewsForm, LoginForm
+from workspace.forms import NewsForm, LoginForm, RegisterForm
 
 
 def main(request):
@@ -98,3 +98,21 @@ def logout_profile(request):
         logout(request)
 
     return redirect('/')
+
+
+def register(request):
+
+    if request.user.is_authenticated:
+        return redirect('/workspace/')
+
+    form = RegisterForm()
+    if request.method == 'POST':
+        form = RegisterForm(data=request.POST)
+
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f'Welcome to News.kg "{user.get_full_name()}"')
+            return redirect('/workspace/')
+
+    return render(request, 'auth/register.html', {'form': form})

@@ -22,6 +22,7 @@
                                         <span>{{ tag.name }}</span> /
                                     {% endfor %}
                                 </p>
+                                <p class="text-end">{{ item.author.get_full_name }}</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div><a href="{% url 'detail_news' id=item.id %}" class="btn btn-primary">View</a>
                                     </div>

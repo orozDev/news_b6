@@ -14,7 +14,7 @@
     {% endfor %}
     </p>
     <p>{{ news.content|safe }}</p>
-    <p class="text-end">Author: {{ news.author }}</p>
+    <p class="text-end">Author: {{ news.author.get_full_name }}</p>
 
 {#    {{ news.name|json_script:'news' }}#}
 {##}

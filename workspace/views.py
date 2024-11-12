@@ -5,12 +5,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 
-from news.models import News, Category, Tag
+from news.models import News
+from workspace.decorators import _login_required, is_owner
 from workspace.forms import NewsForm, LoginForm, RegisterForm
 
 
+@_login_required
 def main(request):
-    news = News.objects.all().order_by('-date')
+
+    if not request.user.is_authenticated:
+        return redirect('/')
+
+    news = News.objects.filter(author=request.user).order_by('-date')
 
     # search = request.GET.get('search')
     # if search:
@@ -19,18 +25,21 @@ def main(request):
     page = request.GET.get('page', 1) or 1
     pagin = Paginator(news, 10)
     news = pagin.get_page(page)
-
     return render(request, 'workspace/index.html', {'news': news})
 
 
+@_login_required
 def create_news(request):
+
     form = NewsForm()
 
     if request.method == 'POST':
         form = NewsForm(data=request.POST, files=request.FILES)
 
         if form.is_valid():
-            news = form.save()
+            news = form.save(commit=False)
+            news.author = request.user
+            news.save()
 
             messages.success(request, f'The news "{news.name}" was created successfully!')
             return redirect('/workspace/')
@@ -40,6 +49,8 @@ def create_news(request):
     return render(request, 'workspace/create_news.html', {'form': form})
 
 
+@_login_required
+@is_owner
 def update_news(request, id):
     news = get_object_or_404(News, id=id)
     form = NewsForm(instance=news)
@@ -60,6 +71,8 @@ def update_news(request, id):
     })
 
 
+@_login_required
+@is_owner
 def delete_news(request, id):
     news = get_object_or_404(News, id=id)
     name = news.name

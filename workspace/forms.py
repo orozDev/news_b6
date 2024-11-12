@@ -32,7 +32,6 @@ class NewsForm(forms.ModelForm):
             'image',
             'description',
             'content',
-            'author',
             'category',
             'is_published',
             'tags',
@@ -51,7 +50,6 @@ class NewsForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'row': 8}),
             'content': forms.Textarea(attrs={'class': 'form-control', 'row': 8}),
-            'author': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Author...'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'tags': forms.CheckboxSelectMultiple(),
         }
@@ -62,8 +60,6 @@ class LoginForm(forms.Form):
     username = forms.CharField(label='Username', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-
-BaseUserCreationForm
 
 
 class RegisterForm(forms.ModelForm):
@@ -94,10 +90,10 @@ class RegisterForm(forms.ModelForm):
         }
 
     def clean(self):
-        password1 = self.cleaned_data.pop('password1', None)
-        password2 = self.cleaned_data.pop('password2', None)
+        password1 = self.cleaned_data.pop('password1')
+        password2 = self.cleaned_data.pop('password2')
 
-        if password1 is not None and password2 is not None:
+        if self.is_valid():
 
             if password1 != password2:
                 raise forms.ValidationError({'password2': ['The passwords are not matched.']})
